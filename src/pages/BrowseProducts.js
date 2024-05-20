@@ -34,7 +34,6 @@ const BrowseProducts=()=>{
         if(status==='success'){
             console.log('Entered success',data)
             console.log(data.pages[0].products)
-            
         }
 
         if(status==='pending'){

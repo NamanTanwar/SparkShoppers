@@ -95,20 +95,23 @@ const getProduct=async (req,res)=>{
     try{
 
         const {productId}=req.params;
+        const {getRelatedProducts}=req.body
 
-        const product=await productService.getProduct(productId)
+        const {product,relatedProducts}=await productService.getProduct(productId,getRelatedProducts)
 
         console.log("Product:",product)
 
+        if(!product){
+            throw new Error('Product not found')
+        }
 
-        const cacheKey=`product:${product._id}`
-        const productData=JSON.stringify(product)
-        await client.hSet(cacheKey,'data',productData)
 
+       
         res.status(httpStatus.OK).json({
-            success:true,
+            success:true, 
             message:"Product fetched successfully",
-            data:product
+            product: product,
+            relatedProducts: relatedProducts,
         })
 
 

@@ -75,10 +75,24 @@ const newRefreshToken=async (refreshToken)=>{
     })
 }
 
+const extractUserIdFromToken=async (token,secret=config.jwt.secret)=>{
+    try{
+        const parts=token.split('.')
+        if(!parts.length){
+            throw new Error('Invalid token')
+        }
+        const decodedToken=jwt.verify(token,secret)
+
+        return decodedToken.sub
+    }catch(err){   
+        console.log('Error in extract userId from token:',err)
+    }
+}
 
 module.exports={
     generateToken,
     generateAuthTokens,
     generateRefreshToken,
-    newRefreshToken
+    newRefreshToken,
+    extractUserIdFromToken,
 }

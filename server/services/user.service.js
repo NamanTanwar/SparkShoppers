@@ -11,7 +11,7 @@ const createUser=async (body)=>{
       
         //Check if user email already taken
     if(await User.isEmailTaken(body.email))
-    throw new ApiError(httpStatus.OK,'Email already taken')
+    throw new Error('Email already taken')
     
     //Hashing user password
     const hashedPassword=await bcrypt.hash(body.password,10)
@@ -33,7 +33,8 @@ const createUser=async (body)=>{
 const getUserByEmail=async (email)=>{
     try{
         
-        const user=User.findOne({email})
+        const user=await User.findOne({email})
+        console.log("User in getUserByEmail service:",user)
         return user;
 
     }catch(err){

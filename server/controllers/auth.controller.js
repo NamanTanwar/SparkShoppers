@@ -1,12 +1,9 @@
 const httpStatus=require('http-status')
-const {userService,tokenService,authService,otpService}=require('../services')
+const {userService,tokenService,authService,otpService,wishlistService,cartService}=require('../services')
  
 //Controller to handle signup.
 const signup=async (req,res)=>{
-    try{
-
-        console.log("Entered in signup controller")
- 
+    try{ 
         //Verifying otp
         const userDetails=await otpService.verifyOtp(req.body.otp)
         //Creating User in DB
@@ -17,12 +14,7 @@ const signup=async (req,res)=>{
             })
         }
 
-
-        console.log("User details obj to be used to create user:",userDetails)
-
         const user=await userService.createUser(userDetails);
-
-        console.log("Created User is:",user)
 
         //Generating JWT Token on successfull creation of user in DB
         const accessToken=await tokenService.generateAuthTokens(user)
@@ -59,6 +51,15 @@ const signup=async (req,res)=>{
                 accessToken
             })
     }catch(err){
+
+        if(err.message==='Email already taken'){
+            res.status(httpStatus.BAD_REQUEST).json({
+                success: false,
+                error: err.message,
+                message:"Account already signed up. Kindly login"
+            })
+        }
+
         console.log("Error in signup:",err);
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             message:err.message,
@@ -70,15 +71,23 @@ const signup=async (req,res)=>{
 //Controller to handle login
 const login=async (req,res)=>{
     try{
-        
+
         const {email,password}=req.body
         //Login user service
         const user=await authService.loginUserWithEmailAndPassword(email,password)
         //generate auth tokens
         const accessToken=await tokenService.generateAuthTokens(user)
-
+ 
         //Generating refresh token 
         const refreshToken=await tokenService.generateRefreshToken(user)
+
+        //fetch user wishlist
+        const userWishlist=await wishlistService.getUserWishlist(email)
+        //fetch user cart
+
+        const userCart=await cartService.getUserCart(user._id)
+        //fetch cart total
+        const cartTotal=await cartService.calculateTotal(user._id)
 
         //sending refresh token as http only cookie
         res.cookie('jwt',refreshToken,{
@@ -90,7 +99,10 @@ const login=async (req,res)=>{
             userId: user._id,
             firstname: user.firstname,
             lastname: user.lastname,
-            email: user.email
+            email: user.email,
+            userWishlist: userWishlist,
+            userCart: userCart,
+            cartTotal: cartTotal,
         }
 
         //sending user along with generated token to client
@@ -184,7 +196,7 @@ const refreshToken=async (req,res)=>{
 }
 
 const logout=async (req,res)=>{
-    console.log("Request recieved")
+
     try{
         const result=await authService.logoutUser(res)
         if(!result){

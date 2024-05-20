@@ -1,17 +1,23 @@
 const Wishlist=require('../models/Wishlist')
+const { getUserByEmail } = require('./user.service')
 
 
 const addToWishlist=async (userId,productId)=>{
 
+    
+
     const newWishlist=await Wishlist.findOneAndUpdate(
         {user: userId},
         {
-            $push: {products: productId}
+            $addToSet: {products: productId}
         },
         {
             new: true,
         }
-    )
+    ).populate({
+        path: 'products',
+        select: '_id name brand price images ratingAndReviews'
+    })
 
     if(!newWishlist){
         throw new Error('User wishlist does not exist')
@@ -20,7 +26,7 @@ const addToWishlist=async (userId,productId)=>{
     return newWishlist
 
 }
-
+//_id,images,name,brand,price,ratingAndReviews
 const removeFromWishlist=async (userId,productId)=>{
 
     const updatedWishlist=await Wishlist.findOneAndUpdate(
@@ -29,7 +35,10 @@ const removeFromWishlist=async (userId,productId)=>{
             $pull: {products: productId}
         },
         {new: true}
-    )
+    ).populate({
+        path: 'products',
+        select: '_id name brand price images ratingAndReviews'
+    })
 
     if(!updatedWishlist){
         throw new Error('User wishlist not found')
@@ -55,10 +64,24 @@ const getAllItems=async (userId)=>{
     return wishlistItems
 }
 
+const getUserWishlist=async (userEmail)=>{
+    try{
+        const user=await getUserByEmail(userEmail)
+        const wishlist=await Wishlist.findOne({user: user._id}).populate({
+            path: 'products',
+            select: '_id name brand price images ratingAndReviews'
+        })
+        return wishlist.products
+    }catch(err){
+        console.log("Error in getUserWishlist service:",err)
+    }
+}
+
 
 module.exports={
     addToWishlist,
     removeFromWishlist,
     getAllItems,
+    getUserWishlist
 }
 

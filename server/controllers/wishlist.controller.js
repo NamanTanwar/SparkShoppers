@@ -1,18 +1,20 @@
 const httpStatus=require('http-status')
 const wishlistService=require('../services/wishlist.service')
+const tokenService=require('../services/token.service')
 
 const addToWishlist=async (req,res)=>{
     try{
+        console.log('Entered addToWishlist controller')
         //Fetching userId and productId from request
-        const {userId,productId}=req.body
-
+        const {productId,userToken}=req.body
+        const userId=await tokenService.extractUserIdFromToken(userToken)
         const newWishlist=await wishlistService.addToWishlist(userId,productId)
 
         //Successfull response
         res.status(httpStatus.OK).json({
             success:true,
             message:"Product added to wishlist",
-            data: newWishlist
+            updatedWishlist: newWishlist.products
         })
 
     }catch(err){
@@ -35,7 +37,13 @@ const addToWishlist=async (req,res)=>{
 
 const removeFromWishlist=async (req,res)=>{
     try{
-        const {userId,productId}=req.body
+        const {productId,userToken}=req.body
+
+        const userId=await tokenService.extractUserIdFromToken(userToken)
+
+        if(!userId){
+            throw new Error('User not authenticated')
+        }
 
         const updatedWishlist=await wishlistService.removeFromWishlist(userId,productId)
 
@@ -50,7 +58,7 @@ const removeFromWishlist=async (req,res)=>{
         let statusCode=httpStatus.INTERNAL_SERVER_ERROR
         let errorMessage="Internal Server Error"
 
-        if(err.message==='User wishlist not found'){
+        if(err.message==='User wishlist not found' || 'User not authenticated'){
             statusCode=httpStatus.BAD_REQUEST,
             errorMessage=err.message
         }

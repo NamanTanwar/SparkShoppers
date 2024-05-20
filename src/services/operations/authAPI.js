@@ -5,6 +5,8 @@ import { setLoading } from "../../slices/categorySlice"
 import {setAccessToken, setIsLoggedIn, setUser} from "../../slices/authSlice"
 import { handleLogout } from "../../slices/authSlice"
 import { setShowLogoutModal } from "../../slices/UISlice"
+import { setWishlistItems,clearWishlist } from "../../slices/wishlistSlice"
+import { setCart,setTotalPrice,clearCart } from "../../slices/cartSlice"
 
 
 const {SEND_OTP_API,SIGNUP_API,LOGIN_API,LOGOUT_API}=authEndpoints
@@ -128,6 +130,9 @@ export const login=(data,navigate)=>{
             dispatch(setIsLoggedIn(true))
             dispatch(setUser(response.data.userResponse))
             dispatch(setAccessToken(response.data.accessToken.access))
+            dispatch(setWishlistItems(response.data.userResponse.userWishlist))
+            dispatch(setCart(response.data.userResponse.userCart))
+            dispatch(setTotalPrice(response.data.userResponse.cartTotal))
 
             toast.success("Login success")
             navigate('/products')
@@ -161,6 +166,8 @@ export const logout=(data,navigate)=>{
 
             //setting state tot initial state
             dispatch(handleLogout())
+            dispatch(clearWishlist())
+            dispatch(clearCart())
             //removing persisited data stored by redux-persist
             localStorage.removeItem('persist-root')
 

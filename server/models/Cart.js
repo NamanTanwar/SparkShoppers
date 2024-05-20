@@ -23,6 +23,16 @@ const cartSchema=mongoose.Schema(
         paymentOption: {
             type:String,
             default: config.default_payment_option
+        },
+        options: {
+            type: [{
+                name: {
+                    type: String,
+                },
+                values: {
+                    type: [String],
+                }
+            }]
         }
     },
     {

@@ -7,6 +7,7 @@ const {uploadImageToCloudinary}=require('../utils/imageUploader')
 const embeddingsService=require( './embeddings.service' )
 const {normalizeL2}=require('../utils/embeddings')
 const {reciprocalRankFusion}=require('../utils/ranking')
+const {client}=require('../config/redisConfig')
 
 const createProduct=async (productName,productDescription,productCategory,productSuperCategory,productCost,productQuantity,productBrand,productImages)=>{
 
@@ -49,8 +50,8 @@ const createProduct=async (productName,productDescription,productCategory,produc
         const image=await uploadImageToCloudinary(
             productImages[i],
             process.env.FOLDER_NAME,
-            1000,
-            1000
+            500,
+            500
         )
         if(!image){
             return res.status(httpStatus.BAD_REQUEST).json({
@@ -118,15 +119,43 @@ const addImageToProduct=async (productId,image)=>{
 
 }
 
-const getProduct=async (productId)=>{
+const getProduct=async (productId,getRelatedProducts)=>{
 
-    const product=await Product.findById(productId).populate('category').populate('ratingAndReviews').populate('superCategory').populate('productOptions')
+     const relatedDataCacheKey=`relatedProducts:${productId}`
+     const cacheKey=`product:${productId}`
+
+    // console.log('Cache miss')
+    let relatedProducts={}
+
+    const product=await Product.findById(productId).populate('category').populate('ratingAndReviews').populate('superCategory').populate('productOptions').select('-productEmbedding')
 
     if(!product){
         throw new Error('Product not found')
     }
+     if(getRelatedProducts){
+        const categoryId=product.category._id
+        relatedProducts=await Product.find(
+            {
+                category:new mongoose.Types.ObjectId(categoryId),
+                _id: {$ne:new mongoose.Types.ObjectId(productId)}
+            },
+            "name brand price images ratingAndReviews",
+            {limit: 10}
+        ).populate('ratingAndReviews') 
+     }
 
-    return product
+     
+     const relatedProductData=JSON.stringify(relatedProducts)
+     const productData=JSON.stringify(product)
+
+     const cacheResult=await Promise.all([
+        await client.hSet(relatedDataCacheKey,'data',relatedProductData),
+        await client.hSet(cacheKey,'data',productData)
+     ])
+
+     console.log("Cache result:",cacheResult)
+
+    return {product,relatedProducts}
 
 }
 

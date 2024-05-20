@@ -5,6 +5,7 @@ import authSlice from "../slices/authSlice"
 import adminSlice from "../slices/adminSlice";
 import productSlice from "../slices/productSlice";
 import cartSlice from "../slices/cartSlice";
+import wishlistSlice from "../slices/wishlistSlice";
 
 const rootReducer=combineReducers({
        UI: UISlice,
@@ -13,6 +14,7 @@ const rootReducer=combineReducers({
        admin: adminSlice,
        products: productSlice,
        cart: cartSlice,
+       wishlist: wishlistSlice,
 })
 
 export default rootReducer;

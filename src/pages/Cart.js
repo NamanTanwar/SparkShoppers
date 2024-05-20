@@ -1,46 +1,23 @@
-import React, { useEffect } from 'react'
-import { useSelector,useDispatch } from 'react-redux';
-import { getUserCart } from '../services/operations/cartAPI';
+import React from 'react'
+import { useSelector } from 'react-redux'
+import CartTable from '../components/core/Cart/CartTable'
 
-const Cart=()=>{
+const CartPage=()=>{
     
-    const dispatch=useDispatch()
+    const {cartItems}=useSelector((state)=>state.cart)
 
-    const {cart,isLoading,error}=useSelector(state => state.cart)
-    const {isLoggedIn}=useSelector(state=>state.auth)
-
-    useEffect(()=>{
-
-        const fetchCartData=async ()=>{
-            const cartData=await dispatch(getUserCart())
-            console.log(cartData)
-        }
-
-    if(isLoggedIn){
-        ;(async ()=>{
-            await fetchCartData()
-        })()
+    const logCartItems=()=>{
+        console.log(cartItems)
     }
     
-    },[isLoggedIn])
+    logCartItems()
 
-    if(isLoading){
-        return <div>Loading...</div>
-    }
-
-    if(error){
-        return <div>{error}</div>
-    }
-    
     return (
-        <div className='flex flex-col'>
-            {
-                cart.map((product,idx)=>(
-                    <h1 key={product._id}>{product.name}</h1>
-                ))
-            }
+        <div>
+            <h1>Cart Page</h1>
+            <CartTable cartItems={cartItems}/>
         </div>
     )
 }
 
-export default Cart
+export default CartPage

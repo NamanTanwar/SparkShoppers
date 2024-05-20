@@ -2,16 +2,21 @@ const Cart=require('../models/Cart')
 const httpStatus=require('http-status')
 const Product=require('../models/Product')
 const cartService=require('../services/cart.service')
+const { tokenService } = require('../services')
 
 
 const addToCart=async (req,res)=>{
     
     try{
-       
+        console.log('Entered addToCart controller')
         //Fetching user and product
-        const {userId,productId}=req.body
+        const {productId,userToken}=req.body
+
+        const userId=await tokenService.extractUserIdFromToken(userToken)
 
         const userCart=await cartService.addToCart(userId,productId)
+
+        const totalPrice=await cartService.calculateTotal(userId)
 
         //If cart not found
         if(!userCart){
@@ -25,7 +30,8 @@ const addToCart=async (req,res)=>{
         res.status(httpStatus.OK).json({
             success:true,
             message:"Product Added To Cart",
-            data: userCart,
+            userCart: userCart,
+            totalPrice: totalPrice,
         })
 
     }catch(err){
@@ -51,13 +57,20 @@ const removeFromCart=async (req,res)=>{
     
     try{
         //Fetching userId and productId
-        const {userId,productId}=req.body
+        const {userToken,productId,removeItem}=req.body
+        //extracting userId from userToken
+        const userId=await tokenService.extractUserIdFromToken(userToken)
+        //Removing item from cart
+        const userCart=await cartService.removeFromCart(userId,productId,removeItem)
 
-        const userCart=await cartService.removeFromCart(userId,productId)
-
-        
+        const cartTotal=await cartService.calculateTotal(userId)
 
         //Validating user cart
+
+
+        console.log('userCart in cart controller:',userCart)
+        console.log('cartTotal in cart controller:',cartTotal)
+
         if(!userCart.cart){
             return res.status(httpStatus.BAD_REQUEST).json({
                 success:false,
@@ -70,7 +83,9 @@ const removeFromCart=async (req,res)=>{
           return res.status(httpStatus.OK).json({
             success:true,
             message:"Item removed from cart",
-            data: userCart.cart
+            userCart: userCart.cart,
+            cartTotal: cartTotal,
+
           })
 
     
@@ -116,8 +131,42 @@ const getAllItems=async (req,res)=>{
     }
 }
 
+const calculateTotal=async (req,res)=>{
+
+    console.log("Request:",req.body)
+
+    const {cartItems}=req.body
+
+    try{
+        
+        const totalAmount=await cartService.calculateTotal(cartItems)
+
+        console.log('cart total amount:',totalAmount)
+
+        if(totalAmount<=0){
+            throw new Error('No items in the Cart')
+        }
+
+        res.status(httpStatus.OK).json({
+            success: true,
+            message: 'Total amount calculated successfully',
+            total: totalAmount
+        })
+
+    }catch(err){
+        console.log('Erro in calculate total controller:',err)
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            error:err.message,
+            message: "Internal Server Error"
+        })
+    }
+
+}
+
 module.exports={
     addToCart,
     removeFromCart,
     getAllItems,
+    calculateTotal,
 }

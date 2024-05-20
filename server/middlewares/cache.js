@@ -5,18 +5,40 @@ const cacheMiddleware=async (req,res,next)=>{
 
     try{
 
-        const {productId}=req.params
-    const cacheKey=`product:${productId}`
-    const cachedProduct=await client.hGetAll(cacheKey)
-    console.log('Cached product received from redis:',cachedProduct)
-    console.log('Cached product from redis:',cachedProduct)
-    if(cachedProduct && Object.keys(cachedProduct).length > 0){
+        let productData
+        let relatedProductData
+
+        const {productId}=req.params;
+        const {getRelatedProducts}=req.body
+
+        const relatedDataCacheKey=`relatedProducts:${productId}`
+        const cacheKey=`product:${productId}`
+        
+        if(getRelatedProducts){
+        [productData,relatedProductData]=await Promise.all([
+            await client.hGet(cacheKey, 'data'),
+            await client.hGet(relatedDataCacheKey,'data')
+       ])
+    }
+    else{
+        productData = await client.hGet(cacheKey,'data')
+    }
+
+    let relatedProducts=[]
+
+    console.log('Cached product received from redis:',productData)
+    console.log('Cached related data from products:',relatedProductData)
+    if(productData && Object.keys(productData).length > 0){
         console.log('Entered cachedProduct block')
-        const productData=cachedProduct['data']
+        const product=JSON.parse(productData) 
+        //const relatedProducts=JSON.parse(relatedProductData)
+        if(relatedProductData)
+            relatedProducts=JSON.parse(relatedProductData)
         res.status(200).json({
             success:true,
             message:'Product fetched successfully',
-            data:JSON.parse(productData) 
+            product,
+            relatedProducts
         }) 
     }
     else{

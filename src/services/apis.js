@@ -13,9 +13,18 @@ export const authEndpoints={
 
 export const productEndpoints={
     CREATE_PRODUCT_API: `${BASE_URL}/product/create-product`,
-    SEARCH_PRODUCT_API: `${BASE_URL}/product/search-product`
+    SEARCH_PRODUCT_API: `${BASE_URL}/product/search-product`,
+    GET_PRODUCT_DATA_API: `${BASE_URL}/product/get-product`
 }
 
 export const cartEndpoints={
-    GET_CART_API: `${BASE_URL}/cart/get-cart`
+    GET_CART_API: `${BASE_URL}/cart/get-cart`,
+    ADD_TO_CART_API: `${BASE_URL}/cart/add-to-cart`,
+    REMOVE_CART_ITEM_API: `${BASE_URL}/cart/remove-from-cart`,
+    CALCULATE_CART_TOTAL: `${BASE_URL}/cart/calculate-total`
+}
+
+export const wishlistEndpoints={
+    REMOVE_WISHLIST_ITEM_API: `${BASE_URL}/wishlist/delete-from-wishlist`,
+    ADD_WISHLIST_ITEM_API: `${BASE_URL}/wishlist/add-to-wishlist`,
 }

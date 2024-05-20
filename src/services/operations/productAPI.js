@@ -4,7 +4,7 @@ import { productEndpoints } from "../apis";
 
 
 
-const {CREATE_PRODUCT_API,SEARCH_PRODUCT_API}=productEndpoints;
+const {CREATE_PRODUCT_API,SEARCH_PRODUCT_API,GET_PRODUCT_DATA_API}=productEndpoints;
 
 
 export const createProduct=async (formData)=>{
@@ -66,3 +66,48 @@ export const getProducts=async (queryKey)=>{
         }
 
 }
+
+export const fetchProductData=async (productId,fetchRelatedProducts,setLoading,setProductData,setError)=>{
+
+    console.log('productId in service:',productId)
+    console.log(`${GET_PRODUCT_DATA_API}/${productId}`)
+    const toastId=toast.loading('Loading...')
+    setError(false)
+    setLoading(true)
+    try{
+        const response=await apiConnector(
+            'GET',
+            `${GET_PRODUCT_DATA_API}/${productId}`,
+            {
+                getRelatedProducts: fetchRelatedProducts
+            },
+        )
+
+        if(!response?.data?.success){
+            throw new Error(response?.data?.message)
+        }
+
+        const product=response.data.product
+        const relatedProducts=response.data.relatedProducts
+        
+        console.log('Response from fetchProductData api:',response)
+        console.log('ProductData:',product)
+        console.log('relatedProductData:',relatedProducts)
+        toast.success('Product data fetched successfully')
+        setLoading(false)
+        setError(false)
+        setProductData({
+            product,
+            relatedProducts
+        })
+        return response 
+    }catch(err){
+        console.log('Error in fetchProductData service layer:',err)
+        console.log(err.message)
+        toast.error('Error in fetching product')
+        setError(err.message)   
+    }finally{
+        setLoading(false) 
+        toast.dismiss(toastId)
+    }
+} 

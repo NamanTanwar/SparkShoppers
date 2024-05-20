@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-query'
 
 
+
 const Home=lazy(()=>import('./pages/Home'))
 const Login=lazy(()=>import('./pages/Login'))
 const Signup=lazy(()=>import('./pages/Signup'))
@@ -20,6 +21,10 @@ const Products=lazy(()=>import('./pages/Products'))
 const AdminDashboard=lazy(()=>import('./pages/AdminDashboard'))
 const BrowseProducts=lazy(()=>import('./pages/BrowseProducts'))
 const AdminAddProduct=lazy(()=>import('./pages/AdminAddProduct'))
+const ProductPage=lazy(()=>import('./pages/ProductPage'))
+const Wishlist=lazy(()=>import('./pages/Wishlist'))
+const Cart=lazy(()=>import('./pages/Cart'))
+const Checkout=lazy(()=>import('./pages/Checkout'))
 
 const router=createBrowserRouter([
   {
@@ -58,6 +63,22 @@ const router=createBrowserRouter([
     path: '/admin-add-product',
     element: <AdminAddProduct />
   },
+  {
+    path: '/product/:productId',
+    element: <ProductPage />
+  },
+  {
+    path: '/wishlist',
+    element: <Wishlist />
+  },
+  {
+    path: '/cart',
+    element: <Cart />
+  },
+  {
+    path: '/checkout',
+    element: <Checkout />
+  }
 ])
 
 const queryClient=new QueryClient()

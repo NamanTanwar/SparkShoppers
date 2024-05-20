@@ -4,11 +4,14 @@ const ApiError=require('../utils/ApiError')
 
 const verifyCallback=(req,resolve,reject)=>async (err,user,info)=>{
 
-   // const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-   // console.log('Incoming token:', token);
+    console.log('Request obj:',req.body)
+    console.log('Request headers:',req.headers)
+
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+   console.log('Incoming token:', token);
 
     if(err || info || !user){
-        //console.log('Authentication failed. Error:', err, 'Info:', info);
+        console.log('Authentication failed. Error:', err, 'Info:', info);
         return reject(new ApiError(httpStatus.UNAUTHORIZED,'Please authenticate'))
     }
     req.user=user

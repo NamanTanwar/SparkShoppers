@@ -31,6 +31,7 @@ const validate=(schema)=>(req,res,next)=>{
 
     //If validation fails
     if(error){
+        console.log('Error is:',error)
         const errorMessage=error.details
         .map((detail)=>detail.message)
         .join(',')
