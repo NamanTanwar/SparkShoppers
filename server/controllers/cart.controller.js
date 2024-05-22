@@ -8,7 +8,7 @@ const { tokenService } = require('../services')
 const addToCart=async (req,res)=>{
     
     try{
-        console.log('Entered addToCart controller')
+    
         //Fetching user and product
         const {productId,userToken}=req.body
 
@@ -44,7 +44,6 @@ const addToCart=async (req,res)=>{
             errorMessage=err.message
         }
 
-        console.log("Error in addToCart route",err)
         res.status(statusCode).json({
             success:false,
             error:err.message,
@@ -67,10 +66,6 @@ const removeFromCart=async (req,res)=>{
 
         //Validating user cart
 
-
-        console.log('userCart in cart controller:',userCart)
-        console.log('cartTotal in cart controller:',cartTotal)
-
         if(!userCart.cart){
             return res.status(httpStatus.BAD_REQUEST).json({
                 success:false,
@@ -90,8 +85,6 @@ const removeFromCart=async (req,res)=>{
 
     
         }catch(err){
-        console.log("Remove from cart error:",err)
-
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             success:false,
             error:err.message,
@@ -132,8 +125,6 @@ const getAllItems=async (req,res)=>{
 }
 
 const calculateTotal=async (req,res)=>{
-
-    console.log("Request:",req.body)
 
     const {cartItems}=req.body
 

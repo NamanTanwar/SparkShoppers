@@ -86,6 +86,7 @@ const login=async (req,res)=>{
         //fetch user cart
 
         const userCart=await cartService.getUserCart(user._id)
+        console.log('userCart here is:',userCart)
         //fetch cart total
         const cartTotal=await cartService.calculateTotal(user._id)
 

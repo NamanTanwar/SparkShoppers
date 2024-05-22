@@ -126,6 +126,21 @@ const deleteUser=async (userId)=>{
 
 }
 
+const updateAddress=async (formData,userId)=>{
+    try{
+        const user=await User.findById(userId)
+        if(user){
+            user.address=JSON.stringify(formData)
+            return user
+        }
+        else{
+            return null
+        }
+    }catch(err){
+        console.log(err)
+    }
+}
+
 module.exports={createUser,
                 getUserByEmail,
                 getUserById,
@@ -134,5 +149,6 @@ module.exports={createUser,
                 createWishlistForUser,
                 deleteCartForUser,
                 deleteWishlistForUser,
-                deleteUser
+                deleteUser,
+                updateAddress
                 }  

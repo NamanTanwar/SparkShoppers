@@ -3,11 +3,11 @@ import { apiConnector } from "../apiConnector"
 import { cartEndpoints } from "../apis"
 import { setLoading,setCart,setError,setTotalPrice } from "../../slices/cartSlice"
 
-const accessToken='xyz'
+
 
 const {GET_CART_API,ADD_TO_CART_API,REMOVE_CART_ITEM_API,CALCULATE_CART_TOTAL}=cartEndpoints
 
-export const getUserCart=()=>{
+export const getUserCart=(userToken)=>{
         return async (dispatch)=>{
             const toastId=toast.loading()
             dispatch(setLoading(true))
@@ -17,7 +17,7 @@ export const getUserCart=()=>{
                     GET_CART_API,
                     null,
                     {
-                        Authorization: `Bearer ${accessToken}`
+                        Authorization: `Bearer ${userToken}`
                     }
 
                 )

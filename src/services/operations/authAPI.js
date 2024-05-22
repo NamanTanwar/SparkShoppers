@@ -117,16 +117,6 @@ export const login=(data,navigate)=>{
                 throw new Error(response?.data?.message)
             }
 
-            console.log("Response is:",response)
-
-            console.log("Response.data is:",response.data)
-
-            console.log("userResponse is:",response.data.userResponse)
-
-            console.log("accessToken is:",response.data.accessToken)
-
-            console.log("accessToken.access is:",response.data.accessToken.access)
-
             dispatch(setIsLoggedIn(true))
             dispatch(setUser(response.data.userResponse))
             dispatch(setAccessToken(response.data.accessToken.access))

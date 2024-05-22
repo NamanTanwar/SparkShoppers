@@ -29,7 +29,7 @@ const userSchema=mongoose.Schema({
     },
     address: {
         type: String,
-        default: config.default_address,
+        default: JSON.stringify(config.default_address),
     },
 }   
     ,

@@ -6,14 +6,12 @@ const { getUserByEmail } = require('./user.service')
 
 
 const addToCart=async (userId,productId)=>{
-        console.log('Entered user cart service')
+       
         const userCart=await Cart.findOne({user:userId})
 
         if(!userCart){
             return false;
         }
-
-        console.log("User cart:",userCart)
 
         const existingProduct=userCart.products.find(
             (product)=>product._id.toString()===productId.toString()
@@ -67,20 +65,13 @@ const addToCart=async (userId,productId)=>{
                 quantity: product.quantity
             })
         }
-        console.log('products array is:',userCart.products)
-        console.log('productWithAlias is:',productWithAlias)
+      
         return productWithAlias
 }
 
 const removeFromCart=async (userId,productId,removeItem=false)=>{
 
-    console.log('user id:',userId)
-    console.log('productiD:',productId)
-    console.log('removeItem:',removeItem)
-
     const userCart=await Cart.findOne({user: userId})
-
-    console.log('User cart found:',userCart)
 
     if(!userCart){
        return {
@@ -89,11 +80,7 @@ const removeFromCart=async (userId,productId,removeItem=false)=>{
           }
     }
 
-    console.log(`User's cart:`,userCart)
-
     const result=userCart.products.find((product)=>product._id.toString()===productId.toString())
-
-    console.log('Result of finding id inside userCart.products:',result)
 
     if(!result){
         return {
@@ -121,7 +108,7 @@ const removeFromCart=async (userId,productId,removeItem=false)=>{
                 select: '_id name brand cost images ratingAndReviews productOptions'
             }
         )
-        console.log('Cart result without alias:',result)
+
         //Successfull response
         let productsWithAlias=[]
         for(let i=0;i<result.products.length;i++){
@@ -132,15 +119,13 @@ const removeFromCart=async (userId,productId,removeItem=false)=>{
             })
         }
 
-        console.log('cart result with alias:',productsWithAlias)
-
         return {
           cart: productsWithAlias,
           message:"Item removed from cart"
         }
 
       }else{
-            console.log('Entered else block i.e. quantity>1 & removeItem=false')
+            
         //Decrement quantity of product
         await Cart.updateOne(
           {user: userId, "products._id": productId },
@@ -154,7 +139,7 @@ const removeFromCart=async (userId,productId,removeItem=false)=>{
                 select: '_id name brand cost images ratingAndReviews productOptions'
             }
         )
-        console.log('cart result without alias:',result)
+      
          //Successfull response
          let productsWithAlias=[]
          for(let i=0;i<result.products.length;i++){
@@ -165,7 +150,7 @@ const removeFromCart=async (userId,productId,removeItem=false)=>{
              })
          }
         //Succcessfull response
-        console.log('products with alias:',productsWithAlias)
+      
         return {
           cart:productsWithAlias,
           message:"quantity decreased",
@@ -176,15 +161,9 @@ const removeFromCart=async (userId,productId,removeItem=false)=>{
  
 const getAllItems=async (userId)=>{
 
-    console.log("printing userId here:",userId)
-
-    console.log('Printing type of userId here:',userId)
-
     //const userIdObject =new mongoose.Types.ObjectId(userId);
     
     const cart=await Cart.findOne({user: userId}).populate('products._id')
-
-    console.log('User cart is:',cart)
 
     if(!cart){
         throw new Error('User cart does not exist')
@@ -228,23 +207,27 @@ const calculateTotal=async (userId)=>{
 
     const result=await Cart.aggregate(cartTotalPipeline)
 
-    console.log('result in calculateTotal service is:',result)
-
     return result.length>0 ? result[0].totalPrice: 0
 
 }
 
 const getUserCart=async (userId)=>{
     
-    const cart=await Cart.findOne({user: userId}).populate({
+    const result=await Cart.findOne({user: userId}).populate({
         path: 'products._id',
-        select: '_id name brand price images ratingAndReviews productOptions'
+        select: '_id name brand cost images ratingAndReviews productOptions'
     })
-    const productWithAlias=cart.products.map(({_id,...product})=>(
-        {product: _id,...product}
-    ))
+   
+    let productsWithAlias=[]
+         for(let i=0;i<result.products.length;i++){
+             let product=result.products[i]
+             productsWithAlias.push({
+                 product: product._id,
+                 quantity: product.quantity
+             })
+         }
 
-    return productWithAlias
+    return productsWithAlias
 
 }
 

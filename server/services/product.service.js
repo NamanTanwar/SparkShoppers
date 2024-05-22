@@ -266,16 +266,6 @@ const searchProduct=async (skip,limit,userQuery,page)=>{
         }
     ]
 
-    //product name
-    //brand name
-    //price
-    //total rating->length of array
-    //images
-    //avg rating 
-
-
-    
-
 
     try{
         //fetching products via text search

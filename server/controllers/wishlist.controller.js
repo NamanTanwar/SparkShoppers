@@ -4,7 +4,6 @@ const tokenService=require('../services/token.service')
 
 const addToWishlist=async (req,res)=>{
     try{
-        console.log('Entered addToWishlist controller')
         //Fetching userId and productId from request
         const {productId,userToken}=req.body
         const userId=await tokenService.extractUserIdFromToken(userToken)

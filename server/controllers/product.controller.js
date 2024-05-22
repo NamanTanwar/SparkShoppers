@@ -36,8 +36,6 @@ const createProduct=async (req,res)=>{
         throw new Error('Error in creating product')
        }
 
-       console.log('New created product:',newProduct)
-       console.log('Text to embedd:',textToEmbbed)
        //creating productOptions
        const newProductOptions=await productService.createProductOptions(newProduct._id,productOptions)
 

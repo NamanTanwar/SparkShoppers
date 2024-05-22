@@ -28,3 +28,8 @@ export const wishlistEndpoints={
     REMOVE_WISHLIST_ITEM_API: `${BASE_URL}/wishlist/delete-from-wishlist`,
     ADD_WISHLIST_ITEM_API: `${BASE_URL}/wishlist/add-to-wishlist`,
 }
+
+export const paymentEndpoints={
+    CAPTURE_PAYMENT_API: `${BASE_URL}/payment/capturePayment`,
+    VERIFY_PAYMENT_API: `${BASE_URL}/payment/verify-payment`
+}
