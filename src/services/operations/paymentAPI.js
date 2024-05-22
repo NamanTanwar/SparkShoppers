@@ -40,7 +40,6 @@ const initiateRazorpayPayment=(orderId,amount,currency,userToken)=>{
             }
           },
         handler: async (response)=>{
-            console.log('response inside handler:',response)
             console.log('Entered handler of payment to call verify payment')
             console.log('Payment verified successfully')
             toast.success('Payment verified succssfully')

@@ -96,8 +96,7 @@ const capturePayment=async (req,res)=>{
 
 const verifyPayment=async (req,res)=>{
 
-    console.log('Request object in verify payment:',req)
-    console.log('Request body is:',req.body)
+   // console.log('Request body is:',req.body)
 
     try{
         
@@ -127,14 +126,12 @@ const verifyPayment=async (req,res)=>{
             const info=await paymentService.sendPaymentSuccessEmail(userOrder.user.firstname,userOrder.user.lastname,userOrder.user.email,userOrder.orderAmount,userOrder.products)
 
             console.log('info:',info)
-            console.log('reached success')
             res.status(httpStatus.OK).json({status: 'ok'})
         }else{
             const userOrder=await orderService.updateOrderStatus(razorpay_order_id,'failed')
             if(!userOrder){
                 throw new Error('error in userOrder')
             }
-            console.log('reached failed')
             res.status(httpStatus.OK).json({status: 'ok'})
         }
         // res.status(httpStatus.OK).json({
