@@ -97,12 +97,14 @@ const ProductPage=()=>{
                   </div>
                 </div>
             </div>
-            {/*Test after adding rating and reviews */}
-            {/*<RatingAndReviews ratingAndReviews={productData.product.ratingAndReviews}/>*/}
+            {productData && <RatingAndReviews ratingAndReviews={productData.product.ratingAndReviews}/>}
               </>  
             )}
             <div>
-              <RelatedProductsSection relatedProducts={productData.relatedProducts} itemsToShow={4}/>
+            {
+              productData && (<RelatedProductsSection relatedProducts={productData.relatedProducts} itemsToShow={4}/>)
+            }
+              
             </div>
         </div>
     )

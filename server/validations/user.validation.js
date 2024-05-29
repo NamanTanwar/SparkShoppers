@@ -35,9 +35,26 @@ const deleteUserSchema={
     })
 }
 
+const addRatingAndReviewSchema={
+    body: Joi.object().keys({
+        userToken: Joi.string().required(),
+        rating: Joi.number().required().min(1).max(5),
+        review: Joi.string().required(),
+        productId: Joi.string().custom(objectId)
+    })
+}
+
+const getRatingAndReviewsSchema={
+    body: Joi.object().keys({
+        userToken: Joi.string().required()
+    })
+}
+
 module.exports={
     getUserSchema,
     createUserSchema,
     setAddressSchema,
-    deleteUserSchema
+    deleteUserSchema,
+    addRatingAndReviewSchema,
+    getRatingAndReviewsSchema
 }

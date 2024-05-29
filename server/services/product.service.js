@@ -1,69 +1,69 @@
-const Product=require('../models/Product')
-const SuperCategory=require('../models/SuperCategory')
-const Category=require('../models/Category')
-const mongoose=require('mongoose')
+const Product = require('../models/Product')
+const SuperCategory = require('../models/SuperCategory')
+const Category = require('../models/Category')
+const mongoose = require('mongoose')
 const ProductOptions = require('../models/ProductOptions')
-const {uploadImageToCloudinary}=require('../utils/imageUploader')
-const embeddingsService=require( './embeddings.service' )
-const {normalizeL2}=require('../utils/embeddings')
-const {reciprocalRankFusion}=require('../utils/ranking')
-const {client}=require('../config/redisConfig')
+const { uploadImageToCloudinary } = require('../utils/imageUploader')
+const embeddingsService = require('./embeddings.service')
+const { normalizeL2 } = require('../utils/embeddings')
+const { reciprocalRankFusion, meanFilter } = require('../utils/ranking')
+const { client } = require('../config/redisConfig')
 
-const createProduct=async (productName,productDescription,productCategory,productSuperCategory,productCost,productQuantity,productBrand,productImages)=>{
+const createProduct = async (productName, productDescription, productCategory, productSuperCategory, productCost, productQuantity, productBrand, productImages) => {
 
 
     //Store images secure_urls
-    let imagesSecureUrls=[]
+    let imagesSecureUrls = []
     //Store categoryId
     let categoryId
     //Store new Category
     let newCategory
 
     //Check if superCategory exists
-    const sCategory=await SuperCategory.findById(new mongoose.Types.ObjectId(productSuperCategory))
-    
-    if(!sCategory){
+    const sCategory = await SuperCategory.findById(new mongoose.Types.ObjectId(productSuperCategory))
+
+    if (!sCategory) {
         throw new Error('Super Category does not exist')
     }
 
     //Check if already a product exists with same name and same category
-    const category=await Category.findOne({name: productCategory})
-    if(category){
-    const findProduct=await Product.findOne({
-        name :productName
+    const category = await Category.findOne({ name: productCategory })
+    if (category) {
+        const findProduct = await Product.findOne({
+            name: productName
         })
 
-        if(findProduct){
+        if (findProduct) {
             throw new Error('Product Already exists')
         }
-        categoryId=category._id
+        categoryId = category._id
     }
-    else{
+    else {
         //creating new Category
-        newCategory=await Category.create(({name : productCategory,products: []}))
-        categoryId=newCategory._id
+        newCategory = await Category.create(({ name: productCategory, products: [] }))
+        categoryId = newCategory._id
     }
-    
+
 
     //Uploading images to cloudinary
-    for(let i=0;i<productImages.length;i++){
-        const image=await uploadImageToCloudinary(
+    for (let i = 0; i < productImages.length; i++) {
+        const image = await uploadImageToCloudinary(
             productImages[i],
             process.env.FOLDER_NAME,
             500,
             500
         )
-        if(!image){
+        if (!image) {
             return res.status(httpStatus.BAD_REQUEST).json({
-                success:false,
-                message:"Error in creating the product"
+                success: false,
+                message: "Error in creating the product"
             })
         }
 
         imagesSecureUrls.push(image.secure_url)
     }
 
-    const newProduct=await Product.create({
+    const newProduct = await Product.create({
         name: productName,
         description: productDescription,
         category: categoryId,
@@ -76,42 +76,42 @@ const createProduct=async (productName,productDescription,productCategory,produc
         superCategory: sCategory._id
     })
 
-    const textToEmbbed=`${productName} ${productDescription} ${productBrand} ${productCategory} ${sCategory.name}`
+    const textToEmbbed = `${productName} ${productDescription} ${productBrand} ${productCategory} ${sCategory.name}`
 
-    if(!newProduct){
+    if (!newProduct) {
         throw new Error('Error in creating product')
     }
 
     sCategory.products.push(newProduct._id)
     sCategory.categories.push(categoryId)
-    if(category){
+    if (category) {
         category.products.push(newProduct._id)
         category.save()
-    }else{
+    } else {
         newCategory.products.push(newProduct._id)
-        newCategory.save()   
+        newCategory.save()
     }
 
     sCategory.save()
 
-    return {newProduct,textToEmbbed}
+    return { newProduct, textToEmbbed }
 
 }
 
-const addImageToProduct=async (productId,image)=>{
+const addImageToProduct = async (productId, image) => {
 
-    const product=await Product.findByIdAndUpdate(
+    const product = await Product.findByIdAndUpdate(
         productId,
         {
             $push: {
-               images: image
+                images: image
             }
-        },{
-            new: true,
-        }
-        )
+        }, {
+        new: true,
+    }
+    )
 
-    if(!product){
+    if (!product) {
         throw new Error('Product not found')
     }
 
@@ -119,107 +119,170 @@ const addImageToProduct=async (productId,image)=>{
 
 }
 
-const getProduct=async (productId,getRelatedProducts)=>{
+const getProduct = async (productId, getRelatedProducts) => {
 
-     const relatedDataCacheKey=`relatedProducts:${productId}`
-     const cacheKey=`product:${productId}`
+    console.log('Value of getRelatedProducts:',getRelatedProducts)
+
+    const relatedDataCacheKey = `relatedProducts:${productId}`
+    const cacheKey = `product:${productId}`
 
     // console.log('Cache miss')
-    let relatedProducts={}
+    let relatedProducts
 
-    const product=await Product.findById(productId).populate('category').populate('ratingAndReviews').populate('superCategory').populate('productOptions').select('-productEmbedding')
+    const product = await Product.findById(productId).populate('category').populate('ratingAndReviews').populate('superCategory').populate('productOptions').select('-productEmbedding')
 
-    if(!product){
+    if (!product) {
         throw new Error('Product not found')
     }
-     if(getRelatedProducts){
-        const categoryId=product.category._id
-        relatedProducts=await Product.find(
+
+    console.log()
+
+    if (getRelatedProducts) {
+        console.log('Entered getRelatedProducts:',getRelatedProducts)
+        const superCategoryId = product.superCategory._id
+        relatedProducts = await Product.find(
             {
-                category:new mongoose.Types.ObjectId(categoryId),
-                _id: {$ne:new mongoose.Types.ObjectId(productId)}
+                superCategory: new mongoose.Types.ObjectId(superCategoryId),
+                _id: { $ne: new mongoose.Types.ObjectId(productId) }
             },
             "name brand price images ratingAndReviews",
-            {limit: 10}
-        ).populate('ratingAndReviews') 
-     }
+            { limit: 10 }
+        ).populate('ratingAndReviews')
+    } 
 
-     
-     const relatedProductData=JSON.stringify(relatedProducts)
-     const productData=JSON.stringify(product)
+    console.log('Related Products in service:',relatedProducts)
 
-     const cacheResult=await Promise.all([
-        await client.hSet(relatedDataCacheKey,'data',relatedProductData),
-        await client.hSet(cacheKey,'data',productData)
-     ])
 
-     console.log("Cache result:",cacheResult)
+    const relatedProductData = JSON.stringify(relatedProducts)
+    const productData = JSON.stringify(product)
 
-    return {product,relatedProducts}
+    let cacheResult
+
+    if(relatedProducts){
+    cacheResult = await Promise.all([
+        await client.hSet(relatedDataCacheKey, 'data', relatedProductData),
+        await client.hSet(cacheKey, 'data', productData)
+    ])
+    }
+    else{
+        cacheResult=await client.hSet(cacheKey,'data',productData)
+    }
+
+    console.log("Cache result:", cacheResult)
+
+    return { product, relatedProducts }
 
 }
 
-const filterProducts=async (filteringConditions)=>{
+const filterProducts = async (filteringConditions) => {
 
-    const products=await Product.find(filteringConditions)
+    const products = await Product.find(filteringConditions)
 
     return products;
 
 }
 
-const createProductOptions=async (productId,productOptions)=>{
+const createProductOptions = async (productId, productOptions) => {
 
-    
+
     //Constructing options object to save
-    const entries=Object.entries(productOptions)
-    const optionsToSave=[]
-    for(const [key,value] of entries){
-        let newKey=key.endsWith('[]') ? key.slice(0,-2) : key
-        const newValue = Array.isArray(value) ? value : [value]; 
+    const entries = Object.entries(productOptions)
+    const optionsToSave = []
+    for (const [key, value] of entries) {
+        let newKey = key.endsWith('[]') ? key.slice(0, -2) : key
+        const newValue = Array.isArray(value) ? value : [value];
         optionsToSave.push({
             name: newKey,
             values: newValue
         })
     }
 
-    try{
-        const newProductOptions=await ProductOptions.create({
+    try {
+        const newProductOptions = await ProductOptions.create({
             product: productId,
             options: optionsToSave
         })
 
-        if(!newProductOptions){
+        if (!newProductOptions) {
             throw new Error('Failed to add product options')
         }
 
         return newProductOptions
-    }catch(err){
-        console.log('Error in create product options service',err)
+    } catch (err) {
+        console.log('Error in create product options service', err)
         throw err
     }
 
 }
 
 
-const searchProduct=async (skip,limit,userQuery,page)=>{
+const searchProduct = async (skip, limit, userQuery, page, categories = null, brands = null, priceRange = null, availability = null) => {
 
-    //converting to vector embedding
-    const embeddedUserQuery=await embeddingsService.createEmbeddings(userQuery)
-    //normalizing for similarity calculation
-    const normalizedEmbedding=normalizeL2(embeddedUserQuery)
+    // Converting to vector embedding
+    const embeddedUserQuery = await embeddingsService.createEmbeddings(userQuery);
+    // Normalizing for similarity calculation
+    const normalizedEmbedding = normalizeL2(embeddedUserQuery);
 
-    console.log('User Query is:',userQuery)
-    console.log(skip,limit)
-    //full text search pipeline
-    const textSearchPipeline=[
+    console.log('User Query is:', userQuery);
+    console.log(skip, limit);
+
+    let initialFilterPipeline = [];
+
+    if (categories) {
+        initialFilterPipeline.push({ $match: { category: { $in: categories } } });
+    }
+
+    if (brands) {
+        initialFilterPipeline.push({ $match: { brand: { $in: brands } } });
+    }
+
+    if (priceRange) {
+        if (priceRange.start !== null && priceRange.end !== null) {
+            initialFilterPipeline.push({ $match: { cost: { $gte: priceRange.start, $lte: priceRange.end } } });
+        } else if (priceRange.start !== null) {
+            initialFilterPipeline.push({ $match: { cost: { $gte: priceRange.start } } });
+        } else if (priceRange.end !== null) {
+            initialFilterPipeline.push({ $match: { cost: { $lte: priceRange.end } } });
+        }
+    }
+
+    if (availability) {
+        initialFilterPipeline.push({ $match: { quantity: { $gte: 1 } } });
+    }
+
+    //TODO:
+    const lookupCategoryStage = {
+        $lookup: {
+            from: 'categories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'categoryDetails'
+        }
+    };
+    //TODO:
+    const unwindCategoryStage = {
+        $unwind: '$categoryDetails'
+    };
+    //TODO:
+    const addFieldsCategoryStage = {
+        $addFields: {
+            category: {
+                _id: '$categoryDetails._id',
+                name: '$categoryDetails.name'
+            }
+        }
+    };
+
+    // Full text search pipeline
+    const textSearchPipeline = [
+        ...initialFilterPipeline,
         {
             $search: {
                 index: 'searchProducts',
                 text: {
                     query: userQuery,
-                    path: ['name','description','brand','category','superCategory','ratingAndReviews']
-                },
-                scoreDetails: true,
+                    path: ['name', 'description', 'brand', 'category', 'superCategory', 'ratingAndReviews']
+                }
             }
         },
         {
@@ -230,25 +293,25 @@ const searchProduct=async (skip,limit,userQuery,page)=>{
                 cost: 1,
                 images: 1,
                 ratingAndReviews: 1,
-                score: {$meta: "searchScoreDetails"}
+                score: { $meta: "searchScore" } // Correct way to access score
             }
         },
-             {
-                    $sort: { score: -1 } // Sort by score in descending order    
-             }
-    ]
+        { $sort: { score: -1 } }, // Sort by score in descending order
+        { $skip: skip },
+        { $limit: limit }
+    ];
 
-    //schemantic search pipeline
-    //numOfCandidates->default 100
-    const schematicSearchPipeline =[
+    // Semantic search pipeline
+    const schematicSearchPipeline = [
+        ...initialFilterPipeline,
         {
-            "$vectorSearch": {
-                "index": "vector_index",
-                "path": "productEmbedding",
-                "queryVector": normalizedEmbedding,
-                "numCandidates":100,
-                "limit": 100,
-            },
+            $vectorSearch: {
+                index: "vector_index",
+                path: "productEmbedding",
+                queryVector: normalizedEmbedding,
+                numCandidates: 100,
+                limit: 100,
+            }
         },
         {
             $project: {
@@ -258,49 +321,58 @@ const searchProduct=async (skip,limit,userQuery,page)=>{
                 cost: 1,
                 images: 1,
                 ratingAndReviews: 1,
-                score: {$meta: "vectorSearchScore"}
+                score: { $meta: "vectorSearchScore" }
             }
         },
-        {
-                $sort: { score: -1 } // Sort by score in descending order    
-        }
-    ]
+        { $sort: { score: -1 } }, // Sort by score in descending order
+        { $skip: skip },
+        { $limit: limit }
+    ];
 
+    try {
+        // Fetching products via text search
+        const productsFromTextSearch = await Product.aggregate(textSearchPipeline);
+        console.log('Text search products:', productsFromTextSearch);
 
-    try{
-        //fetching products via text search
-        const productsFromTextSeach=await Product.aggregate(textSearchPipeline)
-        console.log('Text search products:',productsFromTextSeach)
-        //fetching products via schemantic search
-        const  productsFromSchematicSearch= await Product.aggregate(schematicSearchPipeline)
-        console.log('Schemantic search products:',productsFromSchematicSearch)
+        // Fetching products via semantic search
+        const productsFromSchematicSearch = await Product.aggregate(schematicSearchPipeline);
 
-        const finalResult=reciprocalRankFusion(productsFromTextSeach,productsFromSchematicSearch)
+        let updatedProductsFromSchematicSearch = productsFromSchematicSearch.map((product) => ({
+            ...product,
+            score: product.score + 1
+        }));
 
-        console.log('Final:',finalResult)
+        console.log('Schematic search products:', productsFromSchematicSearch);
 
-        const totalProductDocuments=finalResult.length
-        const hasNextPage=totalProductDocuments>(page*limit)
-        console.log('Total Product Documents:',totalProductDocuments)
-        console.log('Products fetched:',productsFromTextSeach)
+        const finalResult = reciprocalRankFusion(productsFromTextSearch, updatedProductsFromSchematicSearch);
+
+        let filteredResults = meanFilter(finalResult);
+
+        console.log('Results after mean filtering:', filteredResults);
+        console.log('Final:', finalResult);
+
+        const totalProductDocuments = finalResult.length;
+        const hasNextPage = totalProductDocuments > (page * limit);
+        console.log('Total Product Documents:', totalProductDocuments);
+        console.log('Products fetched:', productsFromTextSearch);
+
         return {
-            finalResult,
+            finalResult: filteredResults,
             totalProductDocuments,
             hasNextPage,
-            nextPage: hasNextPage ? page+1 : null
-        }
-    }catch(err){
-        console.log('Error in product service :',err)
-        throw err
+            nextPage: hasNextPage ? page + 1 : null
+        };
+    } catch (err) {
+        console.log('Error in product service:', err);
+        throw err;
     }
+}
 
-} 
-
-module.exports={
+module.exports = {
     createProduct,
     addImageToProduct,
     getProduct,
     filterProducts,
-    createProductOptions, 
+    createProductOptions,
     searchProduct
 }

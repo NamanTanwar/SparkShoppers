@@ -1,24 +1,22 @@
 
 const pagination=(req,res,next)=>{
-
-    console.log('Entered pagination')
-
-    console.log('Request query:',req.query)
-
-    const {page=1,limit: limitFromQuery=10}=req.query
-    const skipNumber=(page-1)*limitFromQuery
-
     
+    console.log('Request query in pagination middlware:',req.query)
+    console.log('Request params:',req.params)
+    
+    const page=parseInt(req.query.page) || 1
+    const limit=parseInt(req.query.limit) || 10
+    const skip=(page-1)*limit
 
-    req.pagination={
-        skip:skipNumber,
-        limit: limitFromQuery,
-        page: page,
-    }
-
+    console.log('skip in pagination:',skip)
+    
+    req.pagination={page,limit,skip}
     next()
 
 }
+
+
+
 
 module.exports={
     pagination

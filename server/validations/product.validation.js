@@ -15,6 +15,9 @@ const productSchema={
 const getProductSchema={
     params: Joi.object().keys({
         productId: Joi.string().custom(objectId)
+    }),
+    body: Joi.object().keys({
+        getRelatedProducts: Joi.boolean()
     })
 }
 

@@ -11,7 +11,7 @@ const router=express.Router()
 //TODO->ADD IMAGE VALIDATION
 router.post('/create-product',productController.createProduct)
 
-router.get('/get-product/:productId',cacheMiddleware,validate(getProductSchema),productController.getProduct)
+router.post('/get-product/:productId',cacheMiddleware,validate(getProductSchema),productController.getProduct)
 
  
 

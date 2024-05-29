@@ -50,6 +50,13 @@ const reciprocalRankFusion=(rankedList1,rankedList2)=>{
 
 }
 
+
+const meanFilter=(products)=>{
+    const mean=products.reduce((acc,product)=>acc+product.product.score,0)/products.length
+    return products.filter(product=>product.product.score>mean)
+}
+
 module.exports={
-    reciprocalRankFusion
+    reciprocalRankFusion,
+    meanFilter
 }

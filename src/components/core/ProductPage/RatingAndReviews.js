@@ -30,8 +30,8 @@ const RatingAndReviews=({ratingAndReviews})=>{
                 {
                     sortedAverages.map((sortedAverage,idx)=>(
                         <div key={idx} className='flex flex-row'>
-                            <p>{sortedAverage[1]} stars</p>
-                            <PercentageBar percentage={sortedAverage[0]}/>
+                            <p>{sortedAverage[0]} stars</p>
+                            <PercentageBar percentage={sortedAverage[1]}/>
                             <p>{sortedAverage[1]}%</p>
                         </div>
                     ))

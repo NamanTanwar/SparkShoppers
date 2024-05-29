@@ -29,7 +29,7 @@ const Carousal=({items,itemsInView})=>{
             <button onClick={handleClickLeft}><FaChevronCircleLeft /></button>
             <div className='overflow-hidden'>
                 {
-                    items.slice(startIdx,endIdx+1).map((item,idx)=>(
+                   items && items.slice(startIdx,endIdx+1).map((item,idx)=>(
                             <ProductCard key={item._id} product={item}/>
                     ))
                 }

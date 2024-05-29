@@ -4,6 +4,10 @@ const bcrypt=require('bcrypt')
 const Cart=require('../models/Cart')
 const Wishlist=require('../models/Wishlist')
 const httpStatus=require('http-status')
+const Order=require('../models/Order')
+const RatingAndReview=require('../models/RatingAndReview')
+const Product=require('../models/Product')
+const { client } = require('../config/redisConfig')
 
 const createUser=async (body)=>{
 
@@ -141,6 +145,83 @@ const updateAddress=async (formData,userId)=>{
     }
 }
 
+const getOrderHistory=async (userId)=>{
+    try{
+        const orderDetails=await Order.find({user: userId}).populate({path: 'products.product',select: 'name'})
+        console.log('Order details:',orderDetails)
+        return orderDetails
+    }catch(err){
+        console.log('error occured in getOrderHistory:',err)
+        throw err
+    }
+}
+
+const addRatingAndReview=async (userId,rating,review,productId)=>{
+    try{
+        console.log('EnteredService')
+        console.log('userId',userId)
+        console.log('rating:',rating)
+        console.log('review:',review)
+        console.log('productId:',productId)
+        review=review.trim()
+
+        const relatedDataCacheKey = `relatedProducts:${productId}`
+        const cacheKey = `product:${productId}`
+
+        const userReview=await RatingAndReview.findOne({
+            user: userId,
+            product: productId
+        })
+
+        if(userReview){
+            throw new Error('Product already reviewed')
+        }
+        
+
+        const ratingAndReview=await RatingAndReview.create({   
+            user: userId,
+            rating: rating,
+            product: productId,
+            review: review,
+        })
+        console.log('ratingand review:',ratingAndReview)
+
+        const product=await Product.findById(productId)
+
+        console.log('product:',product)
+
+        product.ratingAndReviews.push(ratingAndReview._id)
+
+        product.save()
+
+        cacheDeletionResult = await Promise.all([
+            await client.del(relatedDataCacheKey),
+            await client.del(cacheKey)
+        ])
+
+        console.log('cache deletion result:',cacheDeletionResult)
+
+        return ratingAndReview
+
+    }catch(err){
+        console.log('Error occured in ratingAndReview service:',err)
+        throw err
+    }
+}
+
+const getUserReviews=async (userId)=>{
+    try{
+        const reviews=await RatingAndReview.find({user: userId}).populate({path: 'product',select: 'name brand'})
+
+        console.log('Printing reviews:',reviews)
+        
+        return reviews
+
+    }catch(err){
+        console.log('Error in getUserReviews service:',err)
+    }
+}
+
 module.exports={createUser,
                 getUserByEmail,
                 getUserById,
@@ -150,5 +231,8 @@ module.exports={createUser,
                 deleteCartForUser,
                 deleteWishlistForUser,
                 deleteUser,
-                updateAddress
-                }  
+                updateAddress,
+                getOrderHistory,
+                addRatingAndReview,
+                getUserReviews
+}  

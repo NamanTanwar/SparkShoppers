@@ -6,6 +6,7 @@ import adminSlice from "../slices/adminSlice";
 import productSlice from "../slices/productSlice";
 import cartSlice from "../slices/cartSlice";
 import wishlistSlice from "../slices/wishlistSlice";
+import superCategorySlice from "../slices/superCategorySlice";
 
 const rootReducer=combineReducers({
        UI: UISlice,
@@ -15,6 +16,7 @@ const rootReducer=combineReducers({
        products: productSlice,
        cart: cartSlice,
        wishlist: wishlistSlice,
+       superCategory: superCategorySlice,
 })
 
 export default rootReducer;

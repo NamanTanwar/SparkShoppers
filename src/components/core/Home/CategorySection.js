@@ -10,10 +10,11 @@ import Grocery from '../../../assets/categorySvg/Grocery';
 import Other from '../../../assets/categorySvg/Other';
 import SportsAndFitness from '../../../assets/categorySvg/SportsAndFitness';
 import ToysAndGames from '../../../assets/categorySvg/ToysAndGames';
+import { useNavigate } from 'react-router-dom';
 
 const CategorySection=()=>{
 
-    
+    const navigate=useNavigate()
 
     const {loading,superCategories}=useSelector((state)=>state.category)
 
@@ -37,7 +38,9 @@ const CategorySection=()=>{
                 <BabyAndKids />
                 <BeautyAndHealthCare />
                 <BooksAndMusic />
+                <button onClick={()=>navigate('/category/Electronics')}>
                 <Electronics />
+                </button>
                 <Fashion />
                 <Grocery />
                 <Furniture />

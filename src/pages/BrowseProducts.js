@@ -44,46 +44,58 @@ const BrowseProducts=()=>{
         }
 
     return (
-        <div>
-            <Navbar />
-            <div className='flex flex-row'>
-                <BrowseProductsSidebar />
-                <div className='flex flex-col'>
-                <div className='flex flex-row'>
-                    <h1>Showing results for {searchQuery}</h1>
-                    <div className='relative' onMouseEnter={()=>setShowDropDown(true)} onMouseLeave={()=>setShowDropDown(false)}>
-                        <p>{option}</p>
-                        <div className={`absolute ${showDropDown ? "block" : "hidden"}`}>
-                        {
-                            filterOptions.map((option,idx)=>(
-                                <button  key={option.id}>{option.option}</button>
-                            ))
-                        }
+        <div className="min-h-screen bg-gray-100">
+        <Navbar />
+        <div className="flex flex-row p-4">
+            <BrowseProductsSidebar />
+            <div className="flex flex-col w-full">
+                <div className="flex flex-row items-center justify-between mb-4">
+                    <h1 className="text-xl font-bold">Showing results for {searchQuery}</h1>
+                    <div className="relative">
+                        <p 
+                            className="cursor-pointer px-4 py-2 bg-white border border-gray-300 rounded"
+                            onMouseEnter={() => setShowDropDown(true)}
+                            onMouseLeave={() => setShowDropDown(false)}
+                        >
+                            {option}
+                        </p>
+                        <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg ${showDropDown ? "block" : "hidden"}`}>
+                            {
+                                filterOptions.map((filterOption, idx) => (
+                                    <button 
+                                        key={filterOption.id} 
+                                        className="w-full text-left px-4 py-2 hover:bg-gray-200"
+                                        onClick={() => setOption(filterOption.option)}
+                                    >
+                                        {filterOption.option}
+                                    </button>
+                                ))
+                            }
                         </div>
                     </div>
                 </div>
-                <div>
-                {
-                    data.pages[0].products.map((product,idx)=>(
-                        <ProductCard product={product.product.product}/>
-                    ))
-                }
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {
+                        data.pages[0].products.map((product, idx) => (
+                            <ProductCard key={idx} product={product.product.product} />
+                        ))
+                    }
                 </div>
-                <button
-                onClick={()=>fetchNextPage()}
-                disabled={!hasNextPage || isFetchingNextPage}
-                >
-                 {isFetchingNextPage
-                        ? 'Loading more...'
-                        : hasNextPage
-                        ? 'Load More'
-                        : 'Nothing more to load'}
-                </button>
-                <div>{isFetching && !isFetchingNextPage ? 'Fetching...' : null}</div>
+                <div className="mt-4 flex justify-center">
+                    <button
+                        onClick={() => fetchNextPage()}
+                        disabled={!hasNextPage || isFetchingNextPage}
+                        className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+                    >
+                        {isFetchingNextPage ? 'Loading more...' : hasNextPage ? 'Load More' : 'Nothing more to load'}
+                    </button>
+                </div>
+                <div className="mt-2 text-center">
+                    {isFetching && !isFetchingNextPage ? 'Fetching...' : null}
                 </div>
             </div>
         </div>
-        
+    </div>  
     )
 }
 

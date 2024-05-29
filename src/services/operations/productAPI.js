@@ -76,7 +76,7 @@ export const fetchProductData=async (productId,fetchRelatedProducts,setLoading,s
     setLoading(true)
     try{
         const response=await apiConnector(
-            'GET',
+            'POST',
             `${GET_PRODUCT_DATA_API}/${productId}`,
             {
                 getRelatedProducts: fetchRelatedProducts

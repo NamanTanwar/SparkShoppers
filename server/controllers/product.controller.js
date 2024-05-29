@@ -94,6 +94,8 @@ const getProduct=async (req,res)=>{
 
         const {productId}=req.params;
         const {getRelatedProducts}=req.body
+        
+        console.log('Value of getRelatedProducts in service:',getRelatedProducts)
 
         const {product,relatedProducts}=await productService.getProduct(productId,getRelatedProducts)
 
@@ -134,13 +136,13 @@ const searchProduct=async (req,res)=>{
 
         console.log('Pagination info:',req.pagination)
 
-        const {q,category,minVal,maxVal,availability}=req.query
+        const {q,category,priceRange,availability,brand}=req.query
         
         console.log('Params value:',q)
 
         const {skip,limit,page}=req.pagination
 
-        const {finalResult,totalProductDocuments,hasNextPage,nextPage}=await productService.searchProduct(skip,parseInt(limit),q,page)
+        const {finalResult,totalProductDocuments,hasNextPage,nextPage}=await productService.searchProduct(skip,parseInt(limit),q,page,category,brand,priceRange,availability)
 
         if(!finalResult || totalProductDocuments==0)
             throw new Error( 'No Products Found')

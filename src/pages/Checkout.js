@@ -94,16 +94,16 @@ const Checkout=()=>{
     
     
     return (
-        <div>
-            <h1>Checkout</h1>
-            <div className='flex flex-row'>
-                <div className='flex flex-col'>
-                    <h2>Billing Details</h2>
+        <div className="p-4 md:p-8 lg:p-12">
+            <h1  className="text-3xl font-bold mb-8 text-center">Checkout</h1>
+            <div className="flex flex-col lg:flex-row lg:space-x-8">
+                <div className="flex-1 mb-8 lg:mb-0">
+                    <h2 className="text-2xl font-semibold mb-6">Billing Details</h2>
                     <AddressDetailsForm addressData={addressData} setAddressData={setAddressData} inputRefs={inputRefs}/>
                 </div>
-                <div className='flex flex-col'>
+                <div className="flex-1">
                     <CartView />
-                    <button type='submit' onClick={handleCapturePayment}>Place Order</button>
+                    <button type='submit' onClick={handleCapturePayment} className="mt-8 w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:-translate-y-1">Place Order</button>
                 </div>
             </div>
         </div>

@@ -1,8 +1,6 @@
 import React,{useState,useEffect} from 'react'
 
-const ProductImageCarousel=({images,width='200px',height='200 h-full'})=>{
-
-    console.log('Images in carouseol:',images)
+const ProductImageCarousel=({images,width='200px',height='200px'})=>{
     
     const [imageToShowIdx,setImageToShowIdx]=useState(0)
     
@@ -33,8 +31,13 @@ const ProductImageCarousel=({images,width='200px',height='200 h-full'})=>{
     },[isHovering])
 
     return (
-        <div  onMouseEnter={()=>setIsHovering(true)} onMouseLeave={()=>setIsHovering(false)}>
-            <img src={images[imageToShowIdx]} />
+        <div className="relative flex justify-center items-center"
+        style={{ width, height }} onMouseEnter={()=>setIsHovering(true)} onMouseLeave={()=>setIsHovering(false)}>
+            <img
+                src={images[imageToShowIdx]}
+                alt={`Product image ${imageToShowIdx}`}
+                className='object-contain w-full h-full'
+            />
         </div>
     )
 }

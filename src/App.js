@@ -12,6 +12,7 @@ import {
 
 
 
+
 const Home=lazy(()=>import('./pages/Home'))
 const Login=lazy(()=>import('./pages/Login'))
 const Signup=lazy(()=>import('./pages/Signup'))
@@ -25,6 +26,9 @@ const ProductPage=lazy(()=>import('./pages/ProductPage'))
 const Wishlist=lazy(()=>import('./pages/Wishlist'))
 const Cart=lazy(()=>import('./pages/Cart'))
 const Checkout=lazy(()=>import('./pages/Checkout'))
+const SuperCategoryPage=lazy(()=>import('./pages/SuperCategoryPage'))
+const OrderHistory=lazy(()=>import('./pages/OrderHistory'))
+const RatingAndReviews=lazy(()=>import('./pages/RatingAndReviews'))
 
 const router=createBrowserRouter([
   {
@@ -66,7 +70,7 @@ const router=createBrowserRouter([
   {
     path: '/product/:productId',
     element: <ProductPage />
-  },
+  }, 
   {
     path: '/wishlist',
     element: <Wishlist />
@@ -78,6 +82,18 @@ const router=createBrowserRouter([
   {
     path: '/checkout',
     element: <Checkout />
+  },
+  {
+    path: '/category/:categoryName',
+    element: <SuperCategoryPage />
+  },
+  {
+    path: '/my-orders',
+    element: <OrderHistory />
+  },
+  {
+    path: '/my-reviews',
+    element: <RatingAndReviews />
   }
 ])
 

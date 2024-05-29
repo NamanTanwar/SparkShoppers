@@ -5,6 +5,8 @@ const cacheMiddleware=async (req,res,next)=>{
 
     try{
 
+        console.log('request body in cache:',req.body)
+
         let productData
         let relatedProductData
 

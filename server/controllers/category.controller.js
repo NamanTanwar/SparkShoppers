@@ -1,5 +1,6 @@
 const httpStatus=require('http-status')
 const categoryService=require('../services/category.service')
+const { tabularRegression } = require('@huggingface/inference')
 
 const getCategoryProducts=async (req,res)=>{
 
@@ -127,10 +128,129 @@ const createSuperCategory=async (req,res)=>{
     }
 }
 
+const getSuperCategoryPageData=async (req,res)=>{
+    console.log('req.body:',req.body)
+    try{
+        const {superCategoryName,option}=req.body
+        const {page,limit,skip}=req.pagination
+
+        console.log(superCategoryName)
+
+        const {products,categories,brands,minPrice,maxPrice}=await categoryService.getSuperCategoryDataByName(superCategoryName,skip,limit,option)
+
+        console.log('products:',products)
+        console.log('categories:',categories)
+        console.log('brands:',brands)
+
+        let priceRanges=[]
+        if(minPrice && maxPrice){
+            const interval = (maxPrice - minPrice) / 4;
+            for (let i = 0; i < 4; i++) {
+                const start = minPrice + (i * interval);
+                const end = i === 3 ? maxPrice : start + interval;
+                priceRanges.push({ start, end });
+            }
+        }
+
+        res.status(httpStatus.OK).json({
+            success: true,
+            message: 'data fetched successfully',
+            products: products,
+            categories: categories,
+            brands: brands,
+            priceRanges: priceRanges,
+            page: page,
+        })
+
+    }catch(err){
+        console.log('error in getSuperCategoryPageData controller:',err)
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            success:false,
+            error:err.message,
+            message:"Internal Server Error"
+        })
+    }
+}
+
+const getSuperCategoryCategoryData=async (req,res)=>{
+    
+   const {categoryId,superCategoryName}=req.body
+   const {page,limit,skip}=req.pagination
+    try{
+        const {products,brands,categories,minPrice,maxPrice}=await categoryService.getSuperCategoryCategoryData(categoryId,superCategoryName,skip,limit)
+
+        let priceRanges=[]
+        if(minPrice && maxPrice){
+            const interval = (maxPrice - minPrice) / 4;
+            for (let i = 0; i < 4; i++) {
+                const start = minPrice + (i * interval);
+                const end = i === 3 ? maxPrice : start + interval;
+                priceRanges.push({ start, end });
+            }
+        }
+
+        res.status(httpStatus.OK).json({
+            success: true,
+            message: 'data fetched successfully',
+            products: products,
+            categories: categories,
+            brands: brands,
+            priceRanges: priceRanges,
+            page: page,
+        })
+
+    }catch(err){
+        console.log('err in superCategoryCategoryController:',err)
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            error: err.message,
+            message: 'Internal Server Error'
+        })
+    }
+}
+
+const getSuperCategoryBrandData=async (req,res)=>{
+
+    try{
+        const {superCategoryName,brandName}=req.body
+        const {page,limit,skip}=req.pagination
+
+        const {products,brands,categories,minPrice,maxPrice}=await categoryService.getSuperCategoryBrandData(superCategoryName,brandName,limit,skip)
+
+        let priceRanges=[]
+        if(minPrice && maxPrice){
+            const interval = (maxPrice - minPrice) / 4;
+            for (let i = 0; i < 4; i++) {
+                const start = minPrice + (i * interval);
+                const end = i === 3 ? maxPrice : start + interval;
+                priceRanges.push({ start, end });
+            }
+        }
+
+        res.status(httpStatus.OK).json({
+            success: true,
+            message: 'data fetched successfully',
+            products: products,
+            categories: categories,
+            brands: brands,
+            priceRanges: priceRanges,
+            page: page,
+        })
+    }catch(err){
+        console.log('Error in getSuperCategoryBrandData controller:',err)
+    }
+    
+
+
+
+}
 
 module.exports={
     getCategoryProducts,
     getAllCategories,
     getAllSuperCategories,
-    createSuperCategory
+    createSuperCategory,
+    getSuperCategoryPageData,
+    getSuperCategoryCategoryData,
+    getSuperCategoryBrandData
 }

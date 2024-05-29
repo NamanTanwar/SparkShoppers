@@ -4,7 +4,7 @@ const {userService,tokenService,authService,otpService,wishlistService,cartServi
 //Controller to handle signup.
 const signup=async (req,res)=>{
     try{ 
-        //Verifying otp
+        //Verifying otp 
         const userDetails=await otpService.verifyOtp(req.body.otp)
         //Creating User in DB
         if(!userDetails){
