@@ -1,324 +1,81 @@
-import React from 'react';
-import AdminNavbar from '../components/core/AdminDashboard/AdminNavbar';
-import SalesChart from '../components/core/AdminDashboard/SalesChart';
-import ReviewTab from '../components/core/AdminDashboard/ReviewTab';
-import OrdersTab from '../components/core/AdminDashboard/Tabs/OrdersTab';
-import RatingsTab from '../components/core/AdminDashboard/Tabs/RatingsTab';
-import SalesTab from '../components/core/AdminDashboard/Tabs/SalesTab';
+import React, { useEffect } from "react";
+import AdminNavbar from "../components/core/AdminDashboard/AdminNavbar";
+import { getAdminPageData } from "../services/operations/adminAPI";
+import SalesChart from "../components/core/AdminDashboard/SalesChart";
+import OrdersTab from "../components/core/AdminDashboard/Tabs/OrdersTab";
+import SalesTab from "../components/core/AdminDashboard/Tabs/SalesTab";
+import RatingTab from "../components/core/AdminDashboard/Tabs/RatingsTab";
+import RecentReviewsCarousel from "../components/core/AdminDashboard/RecentReviewsCarousel";
+import ProductTable from "../components/core/AdminDashboard/ProductsView";
+import { useDispatch, useSelector } from "react-redux";
+import ConfirmationModal from "../components/common/ConfirmationModal";
 
-const reviewMockData={
-    mostRecentReviews: [
-        {
-            _id: 1,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 2,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 3,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 4,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 5,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 6,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 7,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 8,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 9,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 10,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        }
-    ],
-    worstReviews: [
-        {
-            _id: 1,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'worst product'
-        },
-        {
-            _id: 2,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 3,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 4,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 5,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 6,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 7,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 8,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 9,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 10,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        }
-    ],
-    bestReviews: [
-        {
-            _id: 1,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'best product'
-        },
-        {
-            _id: 2,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 3,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 4,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 5,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 6,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 7,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 8,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 9,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        },
-        {
-            _id: 10,
-            user: {
-                firstname: 'First',
-                lastname: 'Last'
-            },
-            rating: 4,
-            review: 'Good product'
-        }
-    ],
-}
+const AdminDashboard = () => {
+  const { showLogoutModal } = useSelector((state) => state.UI);
+  const { accessToken } = useSelector((state) => state.auth);
 
-const ratingsTabData={
-    total: 318,
-    avgRating: 3.5,
-    currentMonthAvg: 4,
-    lastMonthAvg: 3
-}
+  const {
+    chartData,
+    ordersComparisonData,
+    salesComprisonData,
+    recentReviewsData,
+    ratingsComparisonData,
+    productsData,
+    isLoading,
+    error,
+    month,
+    type,
+    productsOption,
+  } = useSelector((state) => state.admin);
 
-const salesTabData={
-    total: 347000,
-    avgRating: null,
-    currentMonthAvg: 23000,
-    lastMonthAvg: 32000,
-}
+  const dispatch = useDispatch();
 
-const ordersTabData={
-    total: 755,
-    avgRating: null,
-    currentMonthAvg: 300,
-    lastMonthAvg: 250,
-}
+  useEffect(() => {
+    dispatch(getAdminPageData(month, type, productsOption, accessToken.access));
+  }, [month, type]);
 
-const AdminDashboard=()=>{
-    return (
-        <div>
-        <AdminNavbar/>
-        <div className="">
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+      <AdminNavbar />
+      <main className="flex-1 p-6 md:p-8 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="col-span-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+              Sales Overview
+            </h2>
             <SalesChart />
-            <ReviewTab reviews={reviewMockData}/>
-            <OrdersTab ordersTabData={ordersTabData}/>
-            <RatingsTab ratingsTabData={ratingsTabData}/>
-            <SalesTab salesTabData={salesTabData}/>
+          </div>
+          <div className="col-span-1 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="col-span-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <OrdersTab />
+              </div>
+              <div className="col-span-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <SalesTab />
+              </div>
+            </div>
+            <div className="col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+              <RatingTab />
+            </div>
+          </div>
         </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Recent Reviews
+          </h2>
+          <RecentReviewsCarousel />
         </div>
-    )
-}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Product Table
+          </h2>
+          <ProductTable />
+        </div>
+      </main>
+      {/*Conditionally rendering the log out conformation modal*/}
+      <div className="relative">{showLogoutModal && <ConfirmationModal />}</div>
+    </div>
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;

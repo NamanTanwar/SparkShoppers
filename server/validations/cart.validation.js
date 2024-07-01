@@ -5,7 +5,9 @@ const addToCartSchema={
     body: Joi.object().keys({
           //userId: Joi.string().required().custom(objectId),
           productId: Joi.string().required().custom(objectId),
-          userToken: Joi.string()
+          userToken: Joi.string(),
+          productOptions: Joi.object(),
+          quantity: Joi.number()
         })
 }
 

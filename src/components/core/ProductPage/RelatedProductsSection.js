@@ -14,7 +14,7 @@ const RelatedProductsSection=({relatedProducts,itemsToShow})=>{
     }
 
    return (
-    <div>
+    <div className='mb-8'>
         <Carousal items={relatedProducts} itemsInView={itemsToShow}/>
     </div>
    )

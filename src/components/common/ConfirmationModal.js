@@ -9,8 +9,6 @@ const ConfirmationModal=()=>{
 
     const dispatch=useDispatch()
 
-    
-
     const navigate=useNavigate()
     
     const {user}=useSelector((state) => state.auth)
@@ -23,10 +21,12 @@ const ConfirmationModal=()=>{
         dispatch(logout(user,navigate))
     }
 
-    return (
-        <div class="absolute top-56 left-0 w-full h-full">
+ 
 
-            <div class="flex flex-col justify-center items-center space-y-4 mx-auto p-8 max-w-md bg-white rounded-lg shadow-md">
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+
+            <div className="flex flex-col justify-center items-center space-y-4 mx-auto p-8 bg-white rounded-lg shadow-md">
 
                 <h1>Confirm Logout</h1>
 
@@ -36,7 +36,7 @@ const ConfirmationModal=()=>{
 
             <div class="flex flex-row space-x-4">
                 <button class="px-4 py-2 text-gray-700 bg-white rounded-md hover:bg-gray-100 focus:outline-none" onClick={handleBack}>Back</button>
-                <button class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none" onClick={handleLogout}>Logout</button>
+                <button class="px-4 py-2 text-white bg-purple-600 rounded-md hover:bg-purple-600 focus:outline-none" onClick={handleLogout}>Logout</button>
             </div>
 
             </div>

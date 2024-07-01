@@ -1,40 +1,24 @@
-import React from 'react'
-import { useDispatch,useSelector } from 'react-redux'
-import { setProducts } from '../../../../slices/superCategorySlice'
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPriceFilters } from "../../../../slices/superCategorySlice";
+import PriceRangeSidebarSection from "../../../common/PriceRangeSidebarSection";
 
+const PriceSidebar = () => {
+  //Initializing useDispatch hook
+  const dispatch = useDispatch();
 
-const PriceSidebar=()=>{
-    
-    const dispatch=useDispatch()
+  const { priceRanges } = useSelector((state) => state.superCategory);
 
-    const {priceRanges,products}=useSelector((state)=>state.superCategory)
+  const handlePriceRangeFilter = (priceRange) => {
+    dispatch(setPriceFilters(priceRange));
+  };
 
-    const handlePriceRangeFilter=(priceRange)=>{
-        
-        console.log('price range:',priceRange)
-        const filteredProducts=products.filter((product)=>{
-                return parseInt(product.cost)>=parseInt(priceRange.start) && parseInt(product.cost)<=parseInt(priceRange.end)
-        })
-        console.log('filtered products:',filteredProducts)
-        dispatch(setProducts(filteredProducts))
-    
-    }
-    
-    return (
-        <div className='mb-4'>
-            <h2 className="text-lg font-semibold">Price Range:</h2>
-            {
-                priceRanges && priceRanges.length>0 ? (
-                    <ul className='mb-4'>
-                        {
-                            priceRanges.map((priceRange,idx)=>(
-                                <li key={idx} className="cursor-pointer hover:bg-gray-200 p-2 rounded" onClick={()=>handlePriceRangeFilter(priceRange)}>Rs.{priceRange.start}-Rs.{priceRange.end}</li>
-                            ))
-                        }
-                    </ul>) : (<p>No price ranges to show</p>)
-            }
-        </div>
-    )
-}
+  return (
+    <PriceRangeSidebarSection
+      priceRanges={priceRanges}
+      handlePriceRangeFilter={handlePriceRangeFilter}
+    />
+  );
+};
 
-export default PriceSidebar
+export default PriceSidebar;

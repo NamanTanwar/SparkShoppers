@@ -11,6 +11,14 @@ const initialState={
     priceRanges: [],
     selectedSuperCategory: '',
     filteredSuperCategoryProducts: [],
+    hasNextPage: true,
+    categoriesFilters: [],
+    brandsFilters: [],
+    priceFilters: {
+        start: -Infinity,
+        end: Infinity
+    },
+    allFilters: [],
 }
 
 const superCategorySlice=createSlice({
@@ -52,10 +60,57 @@ const superCategorySlice=createSlice({
         },
         setFilteredSuperCategoryProducts: (state,action)=>{
             state.filteredSuperCategoryProducts=action.payload
+        },
+        setHasNextPage: (state,action)=>{
+            state.hasNextPage=action.payload
+        },
+        addFilterCategories: (state,action)=>{
+            if(state.categoriesFilters.some(element=>element._id===action.payload._id))
+                return state
+            return {
+                ...state,
+                categoriesFilters: [...state.categoriesFilters,action.payload],
+                allFilters: [...state.allFilters,action.payload.name]
+            }
+        },
+        addBrandsFilter: (state,action)=>{
+            if(state.brandsFilters.includes(action.payload))
+            return state
+            return {
+                ...state,
+                brandsFilters: [...state.brandsFilters,action.payload],
+                allFilters: [...state.allFilters,action.payload]
+            }
+        },
+        setPriceFilters: (state,action)=>{
+            if(state.priceFilters.start===action.payload.start && state.priceFilters.end===action.payload.end)
+                return state
+            state.priceFilters=action.payload
+        },
+        removeCategoryFilter: (state,action)=>{
+            return {
+                ...state,
+                categoriesFilters: state.categoriesFilters.filter(category=>category._id!==action.payload)
+            }
+        },
+        removeBrandFilter: (state,action)=>{
+            return {
+                ...state,
+                brandsFilters: state.brandsFilters.filter(brand=>brand!==action.payload)
+            }
+        },
+        removePriceFilter: (state,action)=>{
+            return {
+                ...state,
+                priceFilters: {
+                    start: -Infinity,
+                    end: Infinity
+                }
+            }
         }
     }
 })
 
-export const {setProducts,setBrandNames,setCategoryNames,setPricePoints,setLoading,setError,appendProducts,setPriceRanges,setPage,setSelectedSuperCategory,setFilteredSuperCategoryProducts}=superCategorySlice.actions
+export const {setProducts,setBrandNames,setCategoryNames,setPricePoints,setLoading,setError,appendProducts,setPriceRanges,setPage,setSelectedSuperCategory,setFilteredSuperCategoryProducts,setHasNextPage,addFilterCategories,addBrandsFilter,setPriceFilters,removeCategoryFilter,removeBrandFilter,removePriceFilter}=superCategorySlice.actions
 export default superCategorySlice.reducer
 

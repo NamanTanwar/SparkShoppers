@@ -1,63 +1,47 @@
-import React,{useState,useEffect} from 'react'
-import { useDispatch,useSelector } from 'react-redux'
-import useDebounce from '../../../../hooks/useDebounce'
-import { fetchSuperCategoryCategoryData } from '../../../../services/operations/superCategoryAPI'
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import useDebounce from "../../../../hooks/useDebounce";
+import { addFilterCategories } from "../../../../slices/superCategorySlice";
+import CategorySidebarSection from "../../../common/CategorySidebarSection";
 
+const CategorySidebar = () => {
+  //Initializing useDispatch hook
+  const dispatch = useDispatch();
+  //State for search term input
+  const [searchTerm, setSearchTerm] = useState("");
+  //State for filtered categories based on search
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  //Select relevent state from redux store
+  const { categoryNames } = useSelector((state) => state.superCategory);
+  //Custom debounce hook to filter categories based on search term
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  //Effect to filter categories based in debounced search term
+  useEffect(() => {
+    if (debouncedSearchTerm === "") {
+      setFilteredCategories([]);
+      return;
+    }
+    const result = categoryNames.filter((category) =>
+      category.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    );
+    setFilteredCategories(result);
+  }, [debouncedSearchTerm, categoryNames]);
 
-const CategorySidebar=()=>{
+  //Handler for when a category is clicked
+  const handleCategoryClick = (category) => {
+    dispatch(addFilterCategories(category));
+    setSearchTerm("");
+    setFilteredCategories([]);
+  };
+  // Render the CategorySidebarSection component with props
+  return (
+    <CategorySidebarSection
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+      filteredCategories={filteredCategories}
+      handleCategoryClick={handleCategoryClick}
+    />
+  );
+};
 
-    const [searchTerm,setSearchTerm]=useState('')
-    const [filteredCategories,setFilteredCategories]=useState([])
-    const {categoryNames,selectedSuperCategory}=useSelector((state)=>state.superCategory)
-    const dispatch=useDispatch()
-    const debouncedSearchTerm=useDebounce(searchTerm,500)
-
-    useEffect(()=>{
-        if(debouncedSearchTerm===''){
-            setFilteredCategories([])
-            return
-        }
-        const result=categoryNames.filter(category=>category.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()))
-        setFilteredCategories(result)
-    },[debouncedSearchTerm,categoryNames])
-
-     const handleCategoryClick=(categoryId)=>{
-         dispatch(fetchSuperCategoryCategoryData(categoryId,selectedSuperCategory))
-     }
-
-    
-    return (
-        <div className='mb-4'>
-            <h2 className="text-lg font-semibold">Categories</h2>
-            <input 
-                type='text'
-                className='w-full p-2 border border-gray-300 rounded-md mt-2 mb-2'
-                placeholder='Search Categories....'
-                value={searchTerm}
-                onChange={(e)=>setSearchTerm(e.target.value)}
-            />
-            
-                {
-                    filteredCategories && filteredCategories.length>0 ? (
-                        <ul className='mb-4'>
-                            {
-                                filteredCategories.map((category,idx)=>(
-                                    <li key={category._id} className="cursor-pointer hover:bg-gray-200 p-2 rounded" onClick={()=>handleCategoryClick(category._id)}>
-                                        {category.name}
-                                    </li>
-                                ))
-                            }
-                        </ul>
-                    ) : (
-                        <div>
-                            Search Categories to show
-                        </div>
-                    )
-                }
-        </div>
-    )
-}
-
-export default CategorySidebar
-
-//
+export default CategorySidebar;

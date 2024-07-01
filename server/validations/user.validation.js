@@ -2,6 +2,16 @@ const Joi=require('joi')
 const {objectId,password}=require('./custom.validation')
 
 
+const submitContactUsForm={
+    body: Joi.object().keys({
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        phoneNumber: Joi.string(),
+        address: Joi.string(),
+        message: Joi.string().required()
+    })
+}
+
 const getUserSchema={
     params: Joi.object().keys(
         {
@@ -50,11 +60,19 @@ const getRatingAndReviewsSchema={
     })
 }
 
+const sendForgotPasswordEmail={
+    body: Joi.object().keys({
+        email: Joi.string().required()
+    })
+}
+
 module.exports={
     getUserSchema,
     createUserSchema,
     setAddressSchema,
     deleteUserSchema,
     addRatingAndReviewSchema,
-    getRatingAndReviewsSchema
+    getRatingAndReviewsSchema,
+    submitContactUsForm,
+    sendForgotPasswordEmail
 }

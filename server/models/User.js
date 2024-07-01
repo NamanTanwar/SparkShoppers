@@ -21,7 +21,7 @@ const userSchema=mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+       // required: true,
     },
     walletMoney: {
         type: Number,
@@ -31,6 +31,9 @@ const userSchema=mongoose.Schema({
         type: String,
         default: JSON.stringify(config.default_address),
     },
+    googleId: {
+        type: String
+    }
 }   
     ,
     {

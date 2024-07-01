@@ -58,11 +58,11 @@ const ProfileDropdown=()=>{
 
 
     return (
-        <div className="absolute flex flex-col space-y-2 bg-gray-200 p-3 rounded-md shadow-md backdrop-blur-md z-100 top-5 left-5">
+        <div className="absolute flex flex-col space-y-2 bg-gray-200 p-3 rounded-md shadow-md backdrop-blur-md z-50 top-6 left-5">
             
             {
                 profileDropdownData.map((element,idx)=>(
-                    <button key={idx} className="flex flex-row justify-between items-center space-x-4 hover:bg-gray-600 hover:text-white" onClick={element.onClickHandler}>
+                    <button key={idx} className="p-1 flex flex-row justify-between items-center space-x-4 hover:bg-primary-200 hover:rounded-md hover:text-white" onClick={element.onClickHandler}>
                         {element.icon}
                         <p>{element.name}</p>
                     </button>

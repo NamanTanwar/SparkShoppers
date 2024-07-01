@@ -1,34 +1,29 @@
-const nodeMailer=require('nodemailer')
-require('dotenv').config()
+const nodeMailer = require("nodemailer");
+require("dotenv").config();
 
-const mailSender=async (email,title,body)=>{
+const mailSender = async (email, title, body) => {
+  try {
+    let transporter = nodeMailer.createTransport({
+      host: process.env.MAIL_HOST,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    });
 
-    try{
+    let info = transporter.sendMail({
+      from: "Spark Shoppers || Naman Tanwar",
+      to: `${email}`,
+      subject: `${title}`,
+      html: `${body}`,
+    });
 
-        let transporter=nodeMailer.createTransport({
-            host: process.env.MAIL_HOST,
-            auth:{
-                user:process.env.MAIL_USER,
-                pass:process.env.MAIL_PASS,
-            }
-        })
+    return info;
+  } catch (err) {
+    //console.log("Error in mailSender:", err);
+  }
+};
 
-        let info=transporter.sendMail({
-            from: "Spark Shoppers || Naman Tanwar",
-            to: `${email}`,
-            subject: `${title}`,
-            html: `${body}`,
-        })
-
-        console.log("Printing info:",info)
-
-        return info
-
-    }catch(err){
-        console.log("Error in mailSender:",err)
-    }
-}
-
-module.exports={
-    mailSender,
-}
+module.exports = {
+  mailSender,
+};

@@ -23,13 +23,14 @@ const getProductSchema={
 
 const searchProductSchema={
     
-    params: Joi.object().keys({
+    query: Joi.object().keys({
         //All fields are optional by default
-        q: Joi.string(),
-        category: Joi.string(),
-        minValue: Joi.number(),
-        maxValue: Joi.number(),
-        availability: Joi.boolean()
+       q: Joi.string().required(),
+       brands: Joi.string(),
+       categories: Joi.string(),
+       price_start: Joi.number(),
+       price_end: Joi.number(),
+       filter_option: Joi.string(),
     })
 
 }

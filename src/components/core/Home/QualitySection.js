@@ -1,10 +1,14 @@
 import React from 'react';
 import { MdKeyboardArrowRight } from "react-icons/md";
 import Img from "../../../assets/qualitySection.png"
+import { useNavigate } from 'react-router-dom';
 
 const QualitySection=()=>{
+
+    const navigate=useNavigate()
+
     return (
-        <div className="flex flex-col md:flex-row mt-10 justify-center items-center mr-6">
+        <div className="mb-9 flex flex-col md:flex-row mt-10 justify-center items-center mr-6">
 
             <div className="w-full md:w-1/2 relative">
 
@@ -28,10 +32,10 @@ const QualitySection=()=>{
                 </div>
 
                 <div className="flex flex-row items-center space-x-8">
-                        <button className="border-black pl-4 pr-4 pt-2 pb-2 border-x border-y">
+                        <button className="border-black pl-4 pr-4 pt-2 pb-2 border-x border-y hover:border-purple-600 hover:text-purple-600" onClick={()=>navigate('/login')}>
                             Learn More
                         </button>
-                        <button className="flex flex-row items-center">
+                        <button className="flex flex-row items-center hover:text-purple-500" onClick={()=>navigate('/signup')}>
                             Sign Up
                             <MdKeyboardArrowRight />
                         </button>

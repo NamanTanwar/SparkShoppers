@@ -17,23 +17,24 @@ const cartSchema=mongoose.Schema(
                 quantity: {
                      type: Number,
                      required: true,
-                }
+                },
+                options :  {
+                    type: [{
+                      optionType: {
+                        type: String,
+                        required: true
+                      },
+                      option: {
+                        type: String
+                      }
+                    }]
+                  }
             }
         ],
         paymentOption: {
             type:String,
             default: config.default_payment_option
         },
-        options: {
-            type: [{
-                name: {
-                    type: String,
-                },
-                values: {
-                    type: [String],
-                }
-            }]
-        }
     },
     {
         timestamps:true,

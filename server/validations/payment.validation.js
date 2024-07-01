@@ -1,6 +1,13 @@
 const Joi=require('joi')
 const {objectId}=require('../validations/custom.validation')
 
+
+const getOrderDetailsSchema={
+    body: Joi.object().keys({
+        orderId: Joi.string().required()
+    })
+}
+
 const capturePaymentSchema={
 
     body: Joi.object().keys({
@@ -29,4 +36,5 @@ const verifyPaymentSchema={
 module.exports={
     capturePaymentSchema,
     verifyPaymentSchema,
+    getOrderDetailsSchema
 }

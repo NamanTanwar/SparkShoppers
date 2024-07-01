@@ -9,7 +9,10 @@ const getCategoryProductsSchema={
 const getSuperCategoryPageData={
     body: Joi.object().keys({ 
         superCategoryName: Joi.string().required(),
-        option: Joi.string().required()
+        option: Joi.string().required(),
+        categoriesFilters: Joi.array(),
+        brandsFilters: Joi.array(),
+        priceFilters: Joi.object(),
     })
 }
 

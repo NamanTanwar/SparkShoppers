@@ -91,13 +91,13 @@ const BabyAndKidsSvg=({height,width,fill})=>{
 	)
 }
 
-const BabyAndKids=()=>{
+const BabyAndKids=({height,width,fill,border})=>{
 	return (
 		<div className="flex flex-col space-y-2 items-center p-3">
-                    <div className=" border-black border-2 rounded-md p-3">
-                        <BabyAndKidsSvg height={"70px"} width={"70px"} fill={"#000000"}/>
+                    <div className={`border-${border} border-2 rounded-md p-3`}>
+                        <BabyAndKidsSvg height={height} width={width} fill={fill}/>
                     </div>
-                    <p className="font-bold">Baby And Kids</p>
+                    <p className="font-bold text-">Baby And Kids</p>
                 </div>
 	)
 }

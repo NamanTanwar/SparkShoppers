@@ -1,22 +1,13 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { useSelector } from 'react-redux'
-import { CiHeart } from "react-icons/ci";
-import { FaCartShopping } from "react-icons/fa6";
-import { FaCircleUser } from "react-icons/fa6";
 import ProfileDropdown from './ProfileDropdown';
+import { useNavigate } from 'react-router-dom';
+import { navIcons } from '../../../data/navbarIconsData';
 
 const LoggedInNavbar=()=>{
+    const [showProfileDropDown,setShowProfileDropdown]=useState(false)
 
-    const navIcons=[{
-    name: 'Wishlist',
-    icon: <CiHeart/>},
-    {
-    name: 'Cart',
-    icon:<FaCartShopping />},
-    {
-    name: 'My Profile',
-    icon:<FaCircleUser />
-    }]
+    const navigate=useNavigate()
 
     const {showSidebar}=useSelector((state)=>state.UI)
 
@@ -29,7 +20,7 @@ const LoggedInNavbar=()=>{
 
                         {
                             navIcons.map((navIcon,idx)=>(
-                                <div key={idx} className="flex flex-row">
+                                <div key={idx} className="flex flex-row" onClick={()=>'navigate' in navIcon ? navigate(navigate) : setShowProfileDropdown((prevValue)=>!prevValue)}>
                                     <p>{navIcon.name}</p>
                                     {navIcon.icon}
                                 </div>
@@ -42,11 +33,11 @@ const LoggedInNavbar=()=>{
                     <div className='relative flex flex-row space-x-5 items-center justify-center'>
                     
 
-                        <ProfileDropdown />
+                        {showProfileDropDown && (<ProfileDropdown />)}
 
                         {
                             navIcons.map((navIcon,idx)=>(
-                                <button key={idx}>
+                                <button className='text-xl hover:text-purple-600' key={idx} onClick={()=>'navigateTo' in navIcon ? navigate(navIcon.navigateTo) : setShowProfileDropdown((prevValue)=>!prevValue)}>
                                   <span className=''>{navIcon.icon}</span>   
                                 </button>
                             ))

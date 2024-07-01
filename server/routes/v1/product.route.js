@@ -1,30 +1,39 @@
-const express=require('express')
-const productController=require('../../controllers/product.controller')
-const {validate}=require('../../middlewares/validate')
-const {productSchema,getProductSchema,searchProductSchema}=require('../../validations/product.validation')
-const auth=require('../../middlewares/auth')
-const {cacheMiddleware}=require('../../middlewares/cache')
-const {pagination}=require('../../middlewares/pagination')
+const express = require("express");
+const productController = require("../../controllers/product.controller");
+const { validate } = require("../../middlewares/validate");
+const {
+  productSchema,
+  getProductSchema,
+  searchProductSchema,
+} = require("../../validations/product.validation");
+const auth = require("../../middlewares/auth");
+const { cacheMiddleware } = require("../../middlewares/cache");
+const { pagination } = require("../../middlewares/pagination");
 
-const router=express.Router()
- 
-//TODO->ADD IMAGE VALIDATION
-router.post('/create-product',productController.createProduct)
-
-router.post('/get-product/:productId',cacheMiddleware,validate(getProductSchema),productController.getProduct)
-
- 
+const router = express.Router();
 
 //TODO->ADD IMAGE VALIDATION
-router.post('/addImage',auth,productController.addImage)
 
-router.delete('/delete-product/:productId',productController.deleteProduct)
+router.get("/browse-user-page-data", productController.getBrowseUserData);
 
+router.get("/get-new-product", productController.getNewProducts);
 
+router.post("/create-product", auth, productController.createProduct);
 
+router.post(
+  "/get-product/:productId",
+  cacheMiddleware,
+  validate(getProductSchema),
+  productController.getProduct
+);
 
-router.get('/search-product',pagination,productController.searchProduct)
+//TODO->ADD IMAGE VALIDATION
+router.post("/addImage", auth, productController.addImage);
 
-router.post('/test-embedding',productController.testEmbedding)
+router.delete("/delete-product/:productId", productController.deleteProduct);
 
-module.exports=router    
+router.get("/search-product", pagination, productController.searchProduct);
+
+router.post("/test-embedding", productController.testEmbedding);
+
+module.exports = router;
